@@ -4,11 +4,11 @@ import { checkoutSchema } from "@/lib/schemas";
 import { createPixPayment } from "@/lib/asaas";
 
 export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => Object.fromEntries(new URL(req.url).searchParams));
-  const parsed = checkoutSchema.safeParse(body);
+  const raw = req.headers.get("content-type")?.includes("application/json") ? await req.json() : Object.fromEntries((await req.formData()).entries());
+  const parsed = checkoutSchema.safeParse(raw);
   if (!parsed.success) return NextResponse.json({ error: "Dados inválidos" }, { status: 400 });
 
-  const productId = body.productId as string;
+  const productId = String(raw.productId || "");
   const product = await prisma.product.findUnique({ where: { id: productId } });
   if (!product) return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
 
@@ -22,9 +22,19 @@ export async function POST(req: NextRequest) {
     }
   });
 
-  const payment = await createPixPayment({ customer: parsed.data.email, value: Number(product.price), description: product.title, externalReference: order.id });
+  const payment = await createPixPayment({
+    customer: parsed.data.email,
+    value: Number(product.price),
+    description: product.title,
+    externalReference: order.id
+  });
 
   await prisma.order.update({ where: { id: order.id }, data: { paymentProviderId: payment.id } });
 
-  return NextResponse.json({ orderId: order.id, pixQrCode: payment?.encodedImage, pixCopyPaste: payment?.payload, status: "PENDING" });
+  return NextResponse.json({
+    orderId: order.id,
+    pixQrCode: payment?.encodedImage,
+    pixCopyPaste: payment?.payload,
+    status: "PENDING"
+  });
 }
