@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProductType { MANUAL EBOOK CATALOGO }
+enum OrderStatus { PENDING PAID CANCELED }
+
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  name String?
+  passwordHash String?
+  role String @default("ADMIN")
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id String @id @default(cuid())
+  slug String @unique
+  title String
+  description String
+  vehicle String
+  brand String
+  model String
+  year Int
+  category String
+  type ProductType
+  quality String
+  price Decimal @db.Decimal(10,2)
+  coverUrl String
+  pdfUrl String
+  isActive Boolean @default(true)
+  isFeatured Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orderItems OrderItem[]
+}
+
+model Order {
+  id String @id @default(cuid())
+  customerName String
+  customerEmail String
+  customerCpf String?
+  total Decimal @db.Decimal(10,2)
+  status OrderStatus @default(PENDING)
+  paymentProviderId String?
+  createdAt DateTime @default(now())
+  items OrderItem[]
+  downloadAccess DownloadAccess?
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+  orderId String
+  productId String
+  quantity Int
+  price Decimal @db.Decimal(10,2)
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model DownloadAccess {
+  id String @id @default(cuid())
+  orderId String @unique
+  token String @unique
+  expiresAt DateTime
+  downloadCount Int @default(0)
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model SiteSettings {
+  id String @id @default(cuid())
+  storeName String
+  logoUrl String?
+  heroBannerUrl String?
+  whatsapp String?
+  homeTexts Json?
+  socialLinks Json?
+  colors Json?
+  fakeSocialProof Json?
+  manualsSoldCounter Int @default(0)
+  updatedAt DateTime @updatedAt
+}
