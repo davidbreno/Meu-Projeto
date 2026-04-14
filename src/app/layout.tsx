@@ -3,9 +3,17 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await prisma.siteSettings.findFirst();
-  const storeName = settings?.storeName ?? "Manuais Raros";
-  const description = "Acervo premium de manuais raros, restaurados e eBooks para carros antigos.";
+  let storeName = "Dr. David Breno";
+
+  try {
+    const settings = await prisma.siteSettings.findFirst();
+    storeName = settings?.storeName ?? storeName;
+  } catch {
+    storeName = "Dr. David Breno";
+  }
+
+  const description = "Portfolio premium de odontologia estética autoral do Dr. David Breno.";
+
   return {
     metadataBase: new URL("https://manuaisraros.com"),
     title: { default: storeName, template: `%s | ${storeName}` },
@@ -15,14 +23,20 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const settings = await prisma.siteSettings.findFirst();
-  const whatsapp = settings?.whatsapp?.replace(/\D/g, "") || "5511900000000";
+  let whatsapp = "5511900000000";
+
+  try {
+    const settings = await prisma.siteSettings.findFirst();
+    whatsapp = settings?.whatsapp?.replace(/\D/g, "") || whatsapp;
+  } catch {
+    whatsapp = "5511900000000";
+  }
 
   return (
     <html lang="pt-BR">
       <body>
         {children}
-        <a className="fixed bottom-5 right-5 z-40 rounded-full border border-agedGold/40 bg-agedGold px-5 py-3 font-semibold text-matteBlack shadow-2xl" href={`https://wa.me/${whatsapp}`}>
+        <a className="fixed bottom-5 right-5 z-40 rounded-full border border-white/30 bg-[#B83268] px-5 py-3 font-semibold text-white shadow-2xl" href={`https://wa.me/${whatsapp}`}>
           WhatsApp
         </a>
       </body>
