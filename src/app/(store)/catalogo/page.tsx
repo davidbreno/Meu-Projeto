@@ -2,7 +2,13 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 export default async function CatalogoPage() {
-  const produtos = await prisma.product.findMany({ where: { isActive: true }, orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }] });
+  let produtos: Awaited<ReturnType<typeof prisma.product.findMany>> = [];
+
+  try {
+    produtos = await prisma.product.findMany({ where: { isActive: true }, orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }] });
+  } catch {
+    produtos = [];
+  }
 
   return (
     <main className="mx-auto max-w-7xl space-y-8 px-4 py-8 md:px-8">

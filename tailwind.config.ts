@@ -6,6 +6,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        navyDeep: "#0D1B2A",
+        navySoft: "#132238",
+        pureWhite: "#FFFFFF",
+        offWhite: "#F8F7F4",
+        wine: "#8E204B",
+        magentaLux: "#B83268",
         matteBlack: "#0F0F10",
         agedGold: "#B89B5E",
         graphite: "#2D2E32",

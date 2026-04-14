@@ -7,8 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ProductType { MANUAL EBOOK CATALOGO }
-enum OrderStatus { PENDING PAID CANCELED }
+enum ProductType {
+  MANUAL
+  EBOOK
+  CATALOGO
+}
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELED
+}
 
 model User {
   id String @id @default(cuid())
