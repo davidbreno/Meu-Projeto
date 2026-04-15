@@ -1,21 +1,13 @@
 import { MetadataRoute } from "next";
-import { prisma } from "@/lib/prisma";
+import { categoryLabels, products } from "@/data/catalog";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = "https://manuaisraros.com";
+export default function sitemap(): MetadataRoute.Sitemap {
+  const base = "https://garagemvintage.com.br";
+  const staticRoutes = ["", "/catalogo", "/carrinho", "/checkout", "/sobre", "/contato"];
 
-  try {
-    const products = await prisma.product.findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } });
-
-    return [
-      { url: `${base}/`, lastModified: new Date() },
-      { url: `${base}/catalogo`, lastModified: new Date() },
-      ...products.map((p) => ({ url: `${base}/produto/${p.slug}`, lastModified: p.updatedAt }))
-    ];
-  } catch {
-    return [
-      { url: `${base}/`, lastModified: new Date() },
-      { url: `${base}/catalogo`, lastModified: new Date() }
-    ];
-  }
+  return [
+    ...staticRoutes.map((path) => ({ url: `${base}${path}`, lastModified: new Date() })),
+    ...Object.keys(categoryLabels).map((slug) => ({ url: `${base}/categoria/${slug}`, lastModified: new Date() })),
+    ...products.map((product) => ({ url: `${base}/produto/${product.slug}`, lastModified: new Date() }))
+  ];
 }

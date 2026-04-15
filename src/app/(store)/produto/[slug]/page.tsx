@@ -1,73 +1,69 @@
-import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
-import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getProductBySlug, products } from "@/data/catalog";
 import { CheckoutForm } from "./checkout-form";
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const p = await prisma.product.findUnique({ where: { slug } });
-  if (!p) return { title: "Produto não encontrado" };
-  return {
-    title: `${p.title} | Acervo Premium`,
-    description: p.description,
-    openGraph: { title: p.title, description: p.description, images: [p.coverUrl] }
-  };
-}
+  const product = getProductBySlug(slug);
+  if (!product) notFound();
 
-export default async function Produto({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const p = await prisma.product.findUnique({ where: { slug }, include: { orderItems: true } });
-  if (!p) notFound();
-  const related = await prisma.product.findMany({ where: { id: { not: p.id }, isActive: true }, take: 3 });
-
-  const productLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: p.title,
-    description: p.description,
-    image: p.coverUrl,
-    offers: { "@type": "Offer", priceCurrency: "BRL", price: Number(p.price), availability: "https://schema.org/InStock" }
-  };
+  const related = products.filter((item) => product.relatedSlugs.includes(item.slug));
 
   return (
-    <main className="mx-auto grid max-w-7xl gap-6 px-4 py-8 md:grid-cols-[1.15fr_.85fr] md:px-8">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
-      <section className="space-y-4">
-        <div className="catalog-card">
-          <div className="flex flex-wrap gap-2">
-            <span className="vintage-tag">Download imediato</span>
-            <span className="vintage-tag">Restaurado em alta qualidade</span>
-          </div>
-          <h1 className="mt-3 text-5xl">{p.title}</h1>
-          <p className="mt-3 text-vintageBeige/90">{p.description}</p>
-          <p className="mt-3 text-sm text-vintageBeige/80">{p.vehicle} • {p.year} • {p.category}</p>
-          <div className="mt-6 rounded-2xl border border-agedGold/30 bg-black/35 p-5">
-            <h2 className="text-3xl">Preview visual do PDF</h2>
-            <p className="mt-2 text-sm text-vintageBeige/80">Mockup premium de páginas internas com textura de revista automotiva sofisticada.</p>
-          </div>
-        </div>
-
-        <div className="catalog-card">
-          <h2 className="text-3xl">Produtos relacionados</h2>
-          <div className="mt-3 grid gap-3 md:grid-cols-3">
-            {related.map((r) => (
-              <Link key={r.id} href={`/produto/${r.slug}`} className="rounded-xl border border-agedGold/30 bg-black/25 p-3 transition hover:bg-agedGold/10">
-                <p className="text-xl">{r.title}</p>
-                <p className="text-sm text-vintageBeige/80">R$ {Number(r.price).toFixed(2)}</p>
-              </Link>
+    <main className="mx-auto max-w-7xl space-y-8 px-4 py-8 md:px-8">
+      <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {product.images.map((image) => (
+              <div key={image} className="overflow-hidden rounded-2xl border border-[#b88d60] bg-[#f9edd9] p-2">
+                <Image src={image} alt={product.name} width={900} height={700} className="h-64 w-full rounded-xl object-cover" />
+              </div>
             ))}
           </div>
+          <div className="overflow-hidden rounded-2xl border border-[#b88d60] bg-[#f9edd9] p-2">
+            <iframe src={product.videoUrl} title="Vídeo do manual" className="h-[320px] w-full rounded-xl" allowFullScreen />
+          </div>
         </div>
+
+        <aside className="vintage-card h-fit">
+          <p className="text-xs uppercase tracking-[0.2em] text-[#9b653a]">Página de produto premium</p>
+          <h1 className="mt-2 font-serif text-4xl">{product.name}</h1>
+          <p className="mt-3 text-[#61412c]">{product.description}</p>
+          <div className="mt-4 flex items-center gap-3">
+            <p className="text-4xl font-bold text-[#8f4f27]">R$ {product.price.toFixed(2)}</p>
+            {product.compareAtPrice && <p className="text-lg text-[#7c6048] line-through">R$ {product.compareAtPrice.toFixed(2)}</p>}
+          </div>
+          <p className="mt-2 text-sm">Compatível: {product.yearStart} - {product.yearEnd} ({product.model})</p>
+          <div className="mt-5"><CheckoutForm productId={product.id} productName={product.name} productPrice={product.price} /></div>
+          <div className="mt-6 space-y-2 rounded-xl border border-[#c9a37a] bg-[#f5e6d0] p-4 text-sm">
+            <p><strong>Acabamento do papel:</strong> {product.paperFinish}</p>
+            <p><strong>Prazo de envio:</strong> {product.shippingDeadline}</p>
+            <p><strong>Estoque:</strong> {product.stock} unidades</p>
+          </div>
+        </aside>
       </section>
 
-      <aside className="md:sticky md:top-5 md:h-fit">
-        <div className="catalog-card space-y-3">
-          <h2 className="text-4xl text-agedGold">R$ {Number(p.price).toFixed(2)}</h2>
-          <p className="text-sm text-vintageBeige">Após a confirmação do Pix, seu arquivo é liberado instantaneamente.</p>
-          <CheckoutForm productId={p.id} />
-        </div>
-      </aside>
+      <section className="vintage-card">
+        <h2 className="font-serif text-3xl">Compatibilidade por ano/modelo</h2>
+        <ul className="mt-4 list-disc space-y-1 pl-5 text-[#60412d]">{product.compatibility.map((entry) => <li key={entry}>{entry}</li>)}</ul>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <article className="vintage-card">
+          <h3 className="font-serif text-3xl">Produtos relacionados</h3>
+          <div className="mt-4 space-y-3">{related.map((item) => <Link key={item.id} href={`/produto/${item.slug}`} className="block rounded-lg border border-[#c49c72] bg-[#f8ecd8] p-3 font-medium">{item.name}</Link>)}</div>
+        </article>
+        <article className="vintage-card">
+          <h3 className="font-serif text-3xl">FAQ</h3>
+          <div className="mt-4 space-y-3 text-sm text-[#61412c]">
+            <p><strong>É original?</strong> Sim, restaurado fielmente com curadoria editorial.</p>
+            <p><strong>Tem versão PDF?</strong> Para alguns títulos sim, com entrega imediata.</p>
+            <p><strong>Pode parcelar?</strong> PIX com confirmação rápida; cartões serão adicionados no próximo release.</p>
+          </div>
+        </article>
+      </section>
     </main>
   );
 }
