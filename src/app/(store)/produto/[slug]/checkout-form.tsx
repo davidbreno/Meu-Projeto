@@ -1,41 +1,44 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-type Props = { productId: string };
+type Props = { productId: string; productName: string; productPrice: number };
 
-export function CheckoutForm({ productId }: Props) {
+export function CheckoutForm({ productId, productName, productPrice }: Props) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ pixCopyPaste?: string; pixQrCode?: string; error?: string } | null>(null);
+  const [pixLoading, setPixLoading] = useState(false);
 
-  async function handleSubmit(formData: FormData) {
+  function addToCart() {
+    const raw = localStorage.getItem("garage-cart");
+    const cart = raw ? JSON.parse(raw) : [];
+    const exists = cart.find((item: { id: string }) => item.id === productId);
+    const next = exists ? cart.map((item: { id: string; qty: number }) => (item.id === productId ? { ...item, qty: item.qty + 1 } : item)) : [...cart, { id: productId, name: productName, price: productPrice, qty: 1 }];
+    localStorage.setItem("garage-cart", JSON.stringify(next));
     setLoading(true);
-    setResult(null);
-    const payload = Object.fromEntries(formData.entries());
-    const res = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    setResult(res.ok ? data : { error: data.error ?? "Não foi possível gerar Pix." });
-    setLoading(false);
+    setTimeout(() => {
+      setLoading(false);
+      router.push("/carrinho");
+    }, 400);
+  }
+
+  async function payWithPix() {
+    setPixLoading(true);
+    setTimeout(() => {
+      setPixLoading(false);
+      router.push("/checkout");
+    }, 450);
   }
 
   return (
-    <form action={handleSubmit} className="space-y-3">
-      <input name="productId" defaultValue={productId} type="hidden" />
-      <input required name="name" placeholder="Seu nome" className="w-full rounded-lg border border-agedGold/35 bg-black/40 px-3 py-2" />
-      <input required name="email" type="email" placeholder="Seu e-mail" className="w-full rounded-lg border border-agedGold/35 bg-black/40 px-3 py-2" />
-      <button disabled={loading} className="w-full rounded-full bg-agedGold px-4 py-3 font-semibold text-matteBlack disabled:opacity-70">{loading ? "Gerando Pix..." : "Comprar por Pix"}</button>
-
-      {result?.error && <p className="text-sm text-red-300">{result.error}</p>}
-      {result?.pixCopyPaste && (
-        <div className="rounded-xl border border-agedGold/35 bg-black/30 p-3 text-sm">
-          <p className="font-semibold text-agedGold">Pix copia e cola:</p>
-          <p className="mt-1 break-all text-vintageBeige/90">{result.pixCopyPaste}</p>
-        </div>
-      )}
-    </form>
+    <div className="space-y-3">
+      <button onClick={addToCart} className="w-full rounded-full border border-[#9d643c] bg-[#9d582f] px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-[#f6e9d3]">
+        {loading ? "Adicionando..." : "Comprar"}
+      </button>
+      <button onClick={payWithPix} className="w-full rounded-full border border-[#4c311f] bg-[#f1e1c9] px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-[#4d2f1f]">
+        {pixLoading ? "Processando..." : "PIX via Asaas"}
+      </button>
+    </div>
   );
 }

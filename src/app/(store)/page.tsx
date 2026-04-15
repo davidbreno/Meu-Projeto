@@ -1,208 +1,107 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { featuredSlugs, products } from "@/data/catalog";
+import { ProductCard } from "@/components/store/product-card";
 
-const portfolioItems = [
-  { title: "Gota rubi no sorriso", tone: "from-[#8E204B] via-[#B83268] to-[#331323]", size: "md:col-span-2 md:row-span-2" },
-  { title: "Dente iridescente", tone: "from-[#164872] via-[#8eb7d6] to-[#F8F7F4]", size: "md:col-span-1 md:row-span-1" },
-  { title: "Macro vascular", tone: "from-[#451219] via-[#7d1e2c] to-[#13090D]", size: "md:col-span-1 md:row-span-1" },
-  { title: "Chocolate + sorriso", tone: "from-[#2f1a12] via-[#6f3f2f] to-[#b57754]", size: "md:col-span-1 md:row-span-2" },
-  { title: "Molde azul", tone: "from-[#0f3c68] via-[#24a8f5] to-[#c6ecff]", size: "md:col-span-1 md:row-span-1" },
-  { title: "Lâminas artísticas", tone: "from-[#0f1622] via-[#345783] to-[#d7e7fc]", size: "md:col-span-2 md:row-span-1" },
-  { title: "Close macro oral", tone: "from-[#2d1013] via-[#B83268] to-[#e8a1bd]", size: "md:col-span-1 md:row-span-1" }
-];
-
-const specialties = [
-  "Gengivoplastia",
-  "Clareamento",
-  "Estética do sorriso",
-  "Fotografia odontológica",
-  "Cirurgia oral",
-  "Implantodontia",
-  "Reabilitação oral"
-];
-
-const testimonials = [
-  "A experiência foi impecável: técnica, acolhimento e resultado acima das expectativas.",
-  "O planejamento estético do Dr. David elevou totalmente minha autoestima.",
-  "Senti que estava em um estúdio de arte com excelência clínica de alto padrão."
-];
-
+const featured = products.filter((product) => featuredSlugs.includes(product.slug));
+const bestSellers = [...products].sort((a, b) => a.price - b.price).slice(0, 4);
+const kits = products.filter((product) => product.category === "kits");
+const stickers = products.filter((product) => product.category === "adesivos");
 
 export default function HomePage() {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    onScroll();
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
-    <main className="bg-[#0D1B2A] text-white">
-      <header
-       
-        className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-500 ${
-          scrolled ? "border-white/10 bg-[#0D1B2A]/70 backdrop-blur-xl" : "border-transparent bg-transparent"
-        }`}
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-10">
+    <main>
+      <section className="border-b border-[#bf986e] bg-[linear-gradient(110deg,#4a2e1f_0%,#6f4126_38%,#8f582f_100%)] px-4 py-16 text-[#f3dfc4] md:px-8">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1fr_1.1fr]">
           <div>
-            <p className="tracking-[0.4em] text-xs text-[#F8F7F4]/80">BD MONOGRAMA</p>
-            <p className="font-serif text-lg tracking-[0.08em]">DR. DAVID BRENO</p>
+            <p className="mb-3 text-xs uppercase tracking-[0.32em] text-[#f2c997]">Acervo de colecionador</p>
+            <h1 className="font-serif text-5xl leading-tight md:text-7xl">Manuais de carros antigos com acabamento premium.</h1>
+            <p className="mt-5 max-w-xl text-lg text-[#f7e9d5]">Restauração editorial, textura vintage e curadoria para Fusca, Opala, Maverick, Gol Quadrado e clássicos brasileiros.</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/catalogo" className="cta-button">Conferir manuais</Link>
+              <Link href="/categoria/kits" className="rounded-full border border-[#f6d9b7] px-6 py-3 text-sm uppercase tracking-[0.18em] transition hover:bg-white/10">Ver kits premium</Link>
+            </div>
           </div>
-          <Link href="#contato" className="rounded-full border border-white/40 px-4 py-2 text-sm transition hover:border-[#B83268] hover:text-[#F8BCD1]">
-            Agendar avaliação
-          </Link>
+          <div className="relative overflow-hidden rounded-[2rem] border border-[#c89b6a] bg-[#3c2518] p-3 shadow-2xl">
+            <Image src="https://images.unsplash.com/photo-1549923746-c502d488b3ea?auto=format&fit=crop&w=1600&q=80" alt="Fusca amarelo vintage em garagem" width={1600} height={1000} className="h-[420px] w-full rounded-[1.6rem] object-cover" priority />
+          </div>
         </div>
-      </header>
+      </section>
 
-      <section className="relative overflow-hidden px-5 pb-16 pt-36 md:px-10 md:pb-24">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(184,50,104,.28),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,.12),transparent_30%)]" />
-        <div className="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_1.1fr]">
-          <div className="space-y-7">
-            <span className="inline-flex rounded-full border border-white/25 px-4 py-2 text-xs uppercase tracking-[0.32em] text-[#F8F7F4]">Odontologia estética autoral</span>
-            <h1 className="font-serif text-5xl leading-[1.02] text-[#FFFFFF] md:text-7xl">Odontologia estética com arte, precisão e identidade.</h1>
-            <p className="max-w-xl text-lg text-[#F8F7F4]/85">Transformações que unem excelência clínica, sensibilidade estética e fotografia autoral.</p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="#contato" className="rounded-full bg-[#B83268] px-7 py-3 text-sm font-semibold uppercase tracking-[0.2em] transition hover:bg-[#8E204B]">Agendar avaliação</Link>
-              <Link href="#portfolio" className="rounded-full border border-white/30 px-7 py-3 text-sm uppercase tracking-[0.2em] transition hover:border-[#B83268]">Ver portfolio</Link>
+      <section className="border-b border-[#c69c71] bg-[#f4e5d0] px-4 py-5 md:px-8">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 text-sm font-semibold uppercase tracking-[0.14em] text-[#6e472d]">
+          <p>Frete Rápido</p><p>Pagamento Seguro</p><p>Garantia de satisfação</p><p>Pix via Asaas</p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-14 md:px-8">
+        <h2 className="mb-8 text-center font-serif text-5xl text-[#4a2f1f]">Destaques da Garagem</h2>
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {featured.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-[#f0ddc0] px-4 py-14 md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2">
+          <div>
+            <h2 className="mb-6 font-serif text-4xl">Mais vendidos</h2>
+            <div className="space-y-4">
+              {bestSellers.map((item) => (
+                <Link key={item.id} href={`/produto/${item.slug}`} className="vintage-card block">
+                  <p className="font-serif text-2xl">{item.name}</p>
+                  <p className="text-sm text-[#67452f]">{item.vehicle} • {item.yearStart} - {item.yearEnd}</p>
+                </Link>
+              ))}
             </div>
           </div>
+          <div className="vintage-card bg-[#4a2f1f] text-[#f2dfc7]">
+            <p className="text-xs uppercase tracking-[0.25em] text-[#f4c692]">Banner promocional</p>
+            <h3 className="mt-3 font-serif text-5xl">Kit Fusca Completo</h3>
+            <p className="mt-3 text-lg">10% OFF no combo manual + porta manual + adesivos de coleção.</p>
+            <Link href="/produto/kit-fusca-porta-manual-premium" className="mt-6 inline-flex rounded-full border border-[#f4c692] px-6 py-3 text-sm uppercase tracking-[0.18em]">Quero o kit</Link>
+          </div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-6 gap-4">
-            <div className="group relative col-span-6 overflow-hidden rounded-[2rem] border border-white/20 bg-[#132238] p-4 shadow-2xl md:col-span-4 md:row-span-2">
-              <Image src="https://images.unsplash.com/photo-1598257006458-087169a1f08d?auto=format&fit=crop&w=1000&q=80" alt="Dr. David Breno" width={900} height={1200} className="h-[26rem] w-full rounded-2xl object-cover transition duration-700 group-hover:scale-105" />
-            </div>
-            {["Macro artístico", "Lâmina estética", "Contraste clínico"].map((title, i) => (
-              <div key={title} className="col-span-3 overflow-hidden rounded-3xl border border-white/20 bg-[#132238] p-3 md:col-span-2">
-                <div className={`h-full min-h-36 rounded-2xl bg-gradient-to-br ${portfolioItems[i].tone} p-4`}>
-                  <p className="font-serif text-lg">{title}</p>
-                </div>
-              </div>
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-2 md:px-8">
+        <div>
+          <h2 className="mb-5 font-serif text-4xl">Kits Premium</h2>
+          <div className="space-y-4">{kits.map((item) => <ProductCard key={item.id} product={item} />)}</div>
+        </div>
+        <div>
+          <h2 className="mb-5 font-serif text-4xl">Adesivos Vintage</h2>
+          <div className="space-y-4">{stickers.map((item) => <ProductCard key={item.id} product={item} />)}</div>
+        </div>
+      </section>
+
+      <section className="bg-[#4e301f] px-4 py-14 text-[#f3dfc4] md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2">
+          <div>
+            <h2 className="font-serif text-4xl">Resgatando a memória dos clássicos brasileiros.</h2>
+            <p className="mt-4 text-lg">Mais que um e-commerce: um acervo emocional para restauradores, apaixonados por garagem e colecionadores exigentes.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              "Comprei o manual do Opala e parecia peça de museu.",
+              "Os adesivos são absurdamente bonitos na oficina.",
+              "Entrega rápida e qualidade que justifica cada centavo."
+            ].map((quote) => (
+              <article key={quote} className="rounded-xl border border-[#d8b38f]/50 bg-[#6d452d] p-4 text-sm">“{quote}”</article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="portfolio" className="mx-auto max-w-7xl px-5 py-20 md:px-10">
-        <div className="mb-10 flex items-end justify-between gap-4">
-          <h2 className="font-serif text-4xl md:text-5xl">Portfolio mosaico premium</h2>
-          <p className="max-w-md text-sm text-[#F8F7F4]/70">Cada composição foi pensada como case artístico, conectando ciência, textura e narrativa visual.</p>
-        </div>
-        <div className="grid auto-rows-[170px] gap-4 md:grid-cols-4 md:auto-rows-[220px]">
-          {portfolioItems.map((item) => (
-            <article key={item.title} className={`group relative overflow-hidden rounded-3xl border border-white/20 ${item.size}`}>
-              <div className={`absolute inset-0 bg-gradient-to-br ${item.tone} transition duration-700 group-hover:scale-110`} />
-              <div className="absolute inset-0 bg-black/20 transition group-hover:bg-black/5" />
-              <p className="absolute bottom-4 left-4 translate-y-6 font-serif text-xl opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100">{item.title}</p>
-            </article>
-          ))}
-        </div>
+      <section className="mx-auto max-w-5xl px-4 py-14 text-center md:px-8">
+        <h2 className="font-serif text-4xl">Entre para a lista de colecionadores</h2>
+        <p className="mt-3 text-[#60412c]">Receba lançamentos raros, cupons e edições limitadas de manuais restaurados.</p>
+        <form className="mx-auto mt-6 flex max-w-xl flex-col gap-3 sm:flex-row">
+          <input type="email" placeholder="Seu melhor e-mail" className="w-full rounded-full border border-[#b68e66] bg-[#fbf0df] px-5 py-3" />
+          <button className="cta-button">Assinar newsletter</button>
+        </form>
       </section>
-
-      <section className="border-y border-white/10 bg-[#101f31] px-5 py-20 md:px-10">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-2">
-          <div className="space-y-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#B83268]">Sobre o profissional</p>
-            <h3 className="font-serif text-5xl">Precisão clínica com direção de arte.</h3>
-            <p className="text-lg text-[#F8F7F4]/85">“Dr. David Breno une precisão clínica, olhar artístico e sensibilidade humana para transformar sorrisos em experiências visuais, funcionais e emocionais.”</p>
-            <div className="inline-flex flex-wrap gap-2 rounded-2xl border border-white/20 bg-white/5 p-3 text-xs uppercase tracking-[0.18em] text-[#F8F7F4]/80">
-              <span>Cirurgião-dentista</span>•<span>Fotografia odontológica</span>•<span>Estética do sorriso</span>
-            </div>
-          </div>
-          <div className="overflow-hidden rounded-[2rem] border border-white/15 bg-[#0D1B2A] p-4">
-            <Image src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=1000&q=80" alt="Retrato profissional" width={900} height={1100} className="h-full min-h-[24rem] w-full rounded-[1.5rem] object-cover" />
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 py-20 md:px-10">
-        <h3 className="mb-8 font-serif text-4xl">Especialidades</h3>
-        <div className="grid gap-4 md:grid-cols-3">
-          {specialties.map((item, idx) => (
-            <article key={item} className="rounded-2xl border border-white/15 bg-[#132238] p-6 shadow-[0_20px_45px_rgba(0,0,0,.35)]">
-              <p className="text-xs tracking-[0.2em] text-[#B83268]">CASE {(idx + 1).toString().padStart(2, "0")}</p>
-              <h4 className="mt-3 font-serif text-3xl">{item}</h4>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="bg-[#0a1624] px-5 py-20 md:px-10">
-        <div className="mx-auto max-w-7xl">
-          <h3 className="mb-8 font-serif text-4xl">Galeria artística</h3>
-          <div className="grid gap-4 md:grid-cols-5">
-            {[1, 2, 3, 4, 5].map((item) => (
-              <div key={item} className="group relative overflow-hidden rounded-2xl border border-white/10">
-                <div className="h-64 bg-gradient-to-br from-[#132238] via-[#23364f] to-[#B83268] transition duration-700 group-hover:scale-105" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 py-20 md:px-10">
-        <div className="mb-6 flex items-end justify-between gap-6">
-          <h3 className="font-serif text-4xl">Resultados | Antes e depois</h3>
-          <p className="max-w-md text-sm text-[#F8F7F4]/70">Espaço reservado para apresentação de casos clínicos com narrativa visual refinada.</p>
-        </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {["Caso 01", "Caso 02", "Caso 03"].map((item) => (
-            <div key={item} className="rounded-3xl border border-dashed border-white/25 bg-[#132238]/60 p-8 text-center">
-              <p className="font-serif text-3xl">{item}</p>
-              <p className="mt-2 text-sm text-[#F8F7F4]/65">Placeholder premium para evolução clínica</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 pb-20 md:px-10">
-        <h3 className="mb-8 font-serif text-4xl">Depoimentos</h3>
-        <div className="grid gap-4 md:grid-cols-3">
-          {testimonials.map((quote) => (
-            <article key={quote} className="rounded-2xl border border-white/15 bg-[#132238] p-6">
-              <p className="text-lg leading-relaxed text-[#F8F7F4]/90">“{quote}”</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section id="contato" className="bg-[#8E204B] px-5 py-20 md:px-10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 text-center md:flex-row md:text-left">
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-[#F9D9E7]">Experiência boutique</p>
-            <h3 className="font-serif text-4xl text-white">Seu sorriso merece arte, planejamento e excelência clínica.</h3>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <a className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#8E204B]" href="#">Agendar avaliação</a>
-            <a className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold" href="#">WhatsApp</a>
-            <a className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold" href="#">Instagram</a>
-          </div>
-        </div>
-      </section>
-
-      <footer className="border-t border-white/10 bg-[#0D1B2A] px-5 py-10 md:px-10">
-        <div className="mx-auto grid max-w-7xl gap-6 text-sm text-[#F8F7F4]/75 md:grid-cols-3">
-          <div>
-            <p className="text-xs tracking-[0.35em] text-[#B83268]">BD</p>
-            <p className="font-serif text-2xl text-white">DR. DAVID BRENO</p>
-            <p>CIRURGIÃO DENTISTA</p>
-          </div>
-          <div>
-            <p>CRO: 00000 (placeholder)</p>
-            <p>Instagram: @drdavidbreno</p>
-            <p>WhatsApp: (00) 00000-0000</p>
-          </div>
-          <div className="md:text-right">
-            <p>Cidade: São Paulo, SP</p>
-            <p>© {new Date().getFullYear()} Dr. David Breno</p>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }
