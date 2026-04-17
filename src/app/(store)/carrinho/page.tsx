@@ -1,66 +1,54 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
-
-type CartItem = { id: string; name: string; price: number; qty: number };
-
-function useCart() {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    if (typeof window === "undefined") return [];
-    const raw = localStorage.getItem("garage-cart");
-    return raw ? JSON.parse(raw) : [];
-  });
-
-  function update(next: CartItem[]) {
-    setItems(next);
-    localStorage.setItem("garage-cart", JSON.stringify(next));
-  }
-
-  return { items, update };
-}
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import { CartItem, getCart, saveCart } from "@/lib/cart";
+import { formatPrice } from "@/data/catalog";
+import { CheckoutButton } from "@/components/store/checkout-button";
 
 export default function CartPage() {
-  const [coupon, setCoupon] = useState("");
-  const { items, update } = useCart();
+  const [items, setItems] = useState<CartItem[]>([]);
 
-  const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.price * item.qty, 0), [items]);
-  const discount = coupon.toUpperCase() === "GARAGEM10" ? subtotal * 0.1 : 0;
-  const shipping = subtotal > 180 ? 0 : 18;
-  const total = subtotal - discount + shipping;
+  useEffect(() => {
+    setItems(getCart());
+  }, []);
+
+  const total = useMemo(() => items.reduce((acc, item) => acc + item.price * item.quantity, 0), [items]);
 
   return (
-    <main className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[1fr_0.45fr] md:px-8">
-      <section className="vintage-card">
-        <h1 className="font-serif text-4xl">Carrinho Vintage</h1>
-        <div className="mt-6 space-y-3">
-          {items.length === 0 && <p className="text-[#684730]">Seu carrinho está vazio.</p>}
+    <main className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-[1fr_360px] md:px-8">
+      <section>
+        <h1 className="mb-6 text-3xl font-semibold text-[#2f2a36]">Carrinho</h1>
+        <div className="space-y-4">
+          {items.length === 0 && <p className="text-[#6f6878]">Seu carrinho está vazio.</p>}
           {items.map((item) => (
-            <article key={item.id} className="flex items-center justify-between rounded-xl border border-[#c89e73] bg-[#f8ecd8] p-4">
-              <div>
-                <p className="font-semibold">{item.name}</p>
-                <p className="text-sm">Qtd: {item.qty}</p>
+            <article key={item.id} className="flex items-center gap-4 rounded-2xl border border-[#eee7e0] bg-white p-4 shadow-sm">
+              <Image src={item.image} alt={item.name} width={80} height={80} className="h-20 w-20 rounded-xl object-cover" />
+              <div className="flex-1">
+                <p className="font-medium text-[#2f2a36]">{item.name}</p>
+                <p className="text-sm text-[#726b7c]">Qtd: {item.quantity}</p>
               </div>
-              <div className="flex items-center gap-3">
-                <p className="font-semibold">R$ {(item.price * item.qty).toFixed(2)}</p>
-                <button onClick={() => update(items.filter((it) => it.id !== item.id))} className="rounded bg-[#6e4228] px-3 py-1 text-xs text-[#f8e8d2]">Remover</button>
-              </div>
+              <p className="font-semibold text-[#1f1926]">{formatPrice(item.price * item.quantity)}</p>
+              <button
+                className="rounded-full border border-[#e9e2dc] px-3 py-1 text-xs text-[#6d6675]"
+                onClick={() => {
+                  const next = items.filter((current) => current.id !== item.id);
+                  setItems(next);
+                  saveCart(next);
+                }}
+              >
+                Remover
+              </button>
             </article>
           ))}
         </div>
       </section>
-
-      <aside className="vintage-card h-fit">
-        <h2 className="font-serif text-3xl">Resumo do pedido</h2>
-        <label className="mt-4 block text-sm">Cupom</label>
-        <input value={coupon} onChange={(e) => setCoupon(e.target.value)} placeholder="Ex: GARAGEM10" className="mt-1 w-full rounded-lg border border-[#c49c72] bg-[#fff4e4] px-3 py-2" />
-        <div className="mt-4 space-y-2 text-sm">
-          <p>Subtotal: R$ {subtotal.toFixed(2)}</p>
-          <p>Frete: R$ {shipping.toFixed(2)}</p>
-          <p>Desconto: -R$ {discount.toFixed(2)}</p>
-          <p className="text-lg font-bold">Total: R$ {total.toFixed(2)}</p>
+      <aside className="h-fit rounded-2xl border border-[#eee7e0] bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-[#2f2a36]">Resumo</h2>
+        <p className="mt-3 text-[#615a6b]">Total: <strong>{formatPrice(total)}</strong></p>
+        <div className="mt-5">
+          <CheckoutButton productIds={items.map((item) => item.id)} />
         </div>
-        <Link href="/checkout" className="cta-button mt-6 inline-block w-full text-center">Checkout rápido</Link>
       </aside>
     </main>
   );

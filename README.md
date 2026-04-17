@@ -1,46 +1,33 @@
-# Manuais Raros de Carros Antigos
+# Costurinha Digital (Next.js)
 
-## Instalação
-```bash
-npm install
-cp .env.example .env
-```
+E-commerce de moldes digitais em PDF, com layout minimalista e foco em download automático após pagamento.
 
-## Banco de dados / Prisma
-```bash
-npm run prisma:generate
-npm run prisma:migrate
-npm run prisma:seed
-```
+## Stack
 
-## Rodar local
-```bash
-npm run dev
-```
+- Next.js 15 (App Router)
+- TypeScript
+- Tailwind CSS
+- API Routes para checkout e geração de links de download
+- Estrutura pronta para Vercel
 
-## Asaas Sandbox (PIX)
-1. Configure `ASAAS_API_KEY` e `ASAAS_BASE_URL`.
-2. Aponte webhook para `/api/webhooks/asaas`.
-3. Use `ASAAS_WEBHOOK_SECRET` no header `asaas-access-token`.
+## Variáveis de ambiente
 
-## Testar webhook
-```bash
-curl -X POST http://localhost:3000/api/webhooks/asaas \
-  -H 'Content-Type: application/json' \
-  -H 'asaas-access-token: webhook_secret' \
-  -d '{"payment":{"status":"RECEIVED","externalReference":"ORDER_ID"}}'
-```
+Copie `.env.example` para `.env.local` e ajuste:
 
-## Testes
-```bash
-npm run lint
-npm run typecheck
-npm run test
-npm run test:e2e
-npm run build
-```
+- `NEXT_PUBLIC_APP_URL`: URL base da aplicação
+- `STRIPE_PAYMENT_LINK_URL`: link de pagamento Stripe (opcional; fallback local habilitado)
 
-## Deploy na Vercel
-- Conecte repositório na Vercel.
-- Configure variáveis de ambiente do `.env.example`.
-- Use banco PostgreSQL gerenciado.
+## Fluxo de compra
+
+1. Cliente adiciona moldes no carrinho.
+2. Em checkout, o backend retorna URL de pagamento Stripe.
+3. Após pagamento, cliente acessa página de sucesso.
+4. Botão **Download** gera link protegido com expiração em 6 meses e limite de downloads.
+
+## Scripts
+
+- `npm run dev`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run test`
+- `npm run build`
