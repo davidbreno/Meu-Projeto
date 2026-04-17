@@ -1,20 +1,29 @@
+import Link from "next/link";
+
 export function StoreFooter() {
   return (
-    <footer className="mt-16 border-t border-[#c9a57a]/60 bg-[#4a2f1f] px-4 py-10 text-[#f3dfc2] md:px-8">
-      <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-3">
+    <footer className="border-t border-[#efe9e3] bg-white px-4 py-12 md:px-8">
+      <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-3">
         <div>
-          <p className="font-serif text-2xl">Garagem Vintage</p>
-          <p className="mt-2 text-sm">Manuais restaurados, kits premium e itens de coleção para clássicos brasileiros.</p>
+          <p className="text-lg font-semibold text-[#2d2835]">costurinha digital</p>
+          <p className="mt-2 text-sm text-[#6f6778]">Moldes em PDF com download automático e suporte por e-mail.</p>
         </div>
-        <div className="text-sm">
-          <p>WhatsApp: (11) 98888-0000</p>
-          <p>Instagram: @garagemvintage.oficial</p>
-          <p>Email: contato@garagemvintage.com.br</p>
+        <div className="text-sm text-[#6f6778]">
+          <p className="mb-2 font-medium text-[#2d2835]">Links</p>
+          <div className="space-y-2">
+            <Link href="/catalogo" className="block hover:text-[#2d2835]">Todos os moldes</Link>
+            <Link href="/sobre" className="block hover:text-[#2d2835]">Sobre</Link>
+            <Link href="/contato" className="block hover:text-[#2d2835]">Contato</Link>
+            <Link href="/area-cliente" className="block hover:text-[#2d2835]">Área do cliente</Link>
+          </div>
         </div>
-        <div className="text-sm md:text-right">
-          <p>Política de Privacidade</p>
-          <p>Termos e Condições</p>
-          <p>© {new Date().getFullYear()} Garagem Vintage</p>
+        <div className="text-sm text-[#6f6778]">
+          <p className="mb-2 font-medium text-[#2d2835]">Redes sociais</p>
+          <div className="space-y-2">
+            <a href="https://instagram.com" className="block hover:text-[#2d2835]">Instagram</a>
+            <a href="https://pinterest.com" className="block hover:text-[#2d2835]">Pinterest</a>
+            <a href="mailto:contato@costurinhadigital.com" className="block hover:text-[#2d2835]">contato@costurinhadigital.com</a>
+          </div>
         </div>
       </div>
     </footer>
